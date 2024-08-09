@@ -1,4 +1,80 @@
 package com.example.useraccountmanager.model;
 
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.Hibernate;
+
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
+
+@Entity
+@Table(name = "users")
+@Getter
+@Setter
+@Builder
+@RequiredArgsConstructor
+@AllArgsConstructor
 public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", updatable = false, nullable = false)
+    private Long id;
+
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
+    @Column(name = "username")
+    private String username;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    @Column(name = "address")
+    private String address;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Account> accounts = new HashSet<>();
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    @Column(name = "last_login_date")
+    private LocalDateTime lastLoginDate;
+
+    @PrePersist
+    private void prePersist() {
+        LocalDateTime date = LocalDateTime.now();
+        this.createdAt = date;
+        this.updatedAt = date;
+    }
+
+    @PreUpdate
+    private void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        User user = (User) o;
+        return getId() != null && Objects.equals(getId(), user.getId());
+    }
+
 }
