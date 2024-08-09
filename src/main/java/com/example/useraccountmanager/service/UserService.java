@@ -1,11 +1,13 @@
 package com.example.useraccountmanager.service;
 
+import com.example.useraccountmanager.dto.request.AccountRequest;
 import com.example.useraccountmanager.dto.request.UserRequest;
 import com.example.useraccountmanager.dto.response.UserResponse;
 import com.example.useraccountmanager.model.Account;
 import com.example.useraccountmanager.model.User;
 import com.example.useraccountmanager.repository.UserRepository;
 import com.example.useraccountmanager.tools.ErrorMessage;
+import com.example.useraccountmanager.tools.InfoMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -83,6 +85,49 @@ public class UserService {
         }
     }
 
+    public ResponseEntity<?> update(String userId, UserRequest userRequest) {
+        UserResponse userResponse = new UserResponse();
+        try {
+            if (userId == null || userId.isEmpty()) {
+                userResponse.addError(ErrorMessage.BAD_REQUEST);
+                return new ResponseEntity<>(userResponse, HttpStatus.BAD_REQUEST);
+            }
+            Optional<User> optionalUser = userRepository.findById(userId);
+            if (optionalUser.isEmpty()) {
+                userResponse.addError(ErrorMessage.NOT_FOUND);
+                return new ResponseEntity<>(userResponse, HttpStatus.NOT_FOUND);
+            }
+
+            User existingUser = optionalUser.get();
+            updateUserFields(existingUser, userRequest);
+            userRepository.save(existingUser);
+            userResponse = mapToDto(existingUser);
+            return new ResponseEntity<>(userResponse, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("An error occurred while updating user with ID: {}", userId, e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<?> deleteUser(String userId) {
+        try {
+            if (userId == null || userId.isEmpty()) {
+                return new ResponseEntity<>(ErrorMessage.BAD_REQUEST, HttpStatus.BAD_REQUEST);
+            }
+
+            Optional<User> optionalUser = userRepository.findById(userId);
+            if (optionalUser.isEmpty()) {
+                return new ResponseEntity<>(ErrorMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+
+            userRepository.deleteById(userId);
+            return new ResponseEntity<>(InfoMessage.DELETED, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("An error occurred while deleting user with ID: {}", userId, e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     private UserResponse mapToDto(User user) {
         return UserResponse.builder()
                 .id(user.getId())
@@ -99,5 +144,39 @@ public class UserService {
                 .accountIds(user.getAccounts().stream().map(account -> account.getId()).collect(Collectors.toSet()))
                 .build();
     }
+
+    private void updateUserFields(User existingUser, UserRequest userRequest) {
+        if (userRequest.getFirstName() != null && !userRequest.getFirstName().equals(existingUser.getFirstName())) {
+            existingUser.setFirstName(userRequest.getFirstName());
+        }
+        if (userRequest.getLastName() != null && !userRequest.getLastName().equals(existingUser.getLastName())) {
+            existingUser.setLastName(userRequest.getLastName());
+        }
+        if (userRequest.getUsername() != null && !userRequest.getUsername().equals(existingUser.getUsername())) {
+            existingUser.setUsername(userRequest.getUsername());
+        }
+        if (userRequest.getEmail() != null && !userRequest.getEmail().equals(existingUser.getEmail())) {
+            existingUser.setEmail(userRequest.getEmail());
+        }
+        if (userRequest.getPhoneNumber() != null && !userRequest.getPhoneNumber().equals(existingUser.getPhoneNumber())) {
+            existingUser.setPhoneNumber(userRequest.getPhoneNumber());
+        }
+        if (userRequest.getAddress() != null && !userRequest.getAddress().equals(existingUser.getAddress())) {
+            existingUser.setAddress(userRequest.getAddress());
+        }
+        if (userRequest.getAccountRequests() != null) {
+            Set<Account> existingAccounts = existingUser.getAccounts();
+            existingAccounts.clear();
+            for (AccountRequest accountRequest : userRequest.getAccountRequests()) {
+                Account account = new Account();
+                account.setBalance(accountRequest.getBalance());
+                account.setUser(existingUser);
+                existingAccounts.add(account);
+            }
+        }
+
+
+    }
+
 
 }

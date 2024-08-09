@@ -21,6 +21,16 @@ public class UserController {
 
     @PostMapping()
     public ResponseEntity<?> create(@RequestBody UserRequest userRequest, BindingResult bindingResult) {
-       return userService.create(userRequest, bindingResult);
+        return userService.create(userRequest, bindingResult);
+    }
+
+    @PutMapping("{userId}")
+    public ResponseEntity<?> update(@PathVariable String userId, @RequestBody UserRequest userRequest) {
+        return userService.update(userId, userRequest);
+    }
+
+    @DeleteMapping("{userId}")
+    public ResponseEntity<?> deleteUser(@PathVariable String userId) {
+        return userService.deleteUser(userId);
     }
 }
