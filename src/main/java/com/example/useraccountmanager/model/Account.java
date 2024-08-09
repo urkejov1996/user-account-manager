@@ -8,10 +8,10 @@ import org.hibernate.annotations.GenericGenerator;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.UUID;
+
 
 @Entity
-@Table(name = "account")
+@Table(name = "accounts")
 @Getter
 @Setter
 @Builder
