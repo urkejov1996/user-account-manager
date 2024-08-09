@@ -15,5 +15,5 @@ public class UserRequest {
     private String phoneNumber;
     private String address;
     private LocalDateTime lastLoginDate;
-    private Set<Long> accountIds;
+    private Set<AccountRequest> accountRequests;
 }
