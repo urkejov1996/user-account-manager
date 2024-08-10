@@ -55,9 +55,6 @@ public class User {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @Column(name = "last_login_date")
-    private LocalDateTime lastLoginDate;
-
     @PrePersist
     private void prePersist() {
         LocalDateTime date = LocalDateTime.now();

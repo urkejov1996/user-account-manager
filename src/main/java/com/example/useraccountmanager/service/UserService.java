@@ -199,7 +199,6 @@ public class UserService {
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .deletedAt(user.getDeletedAt())
-                .lastLoginDate(user.getLastLoginDate())
                 .accountIds(user.getAccounts().stream().map(account -> account.getId()).collect(Collectors.toSet()))
                 .build();
     }
