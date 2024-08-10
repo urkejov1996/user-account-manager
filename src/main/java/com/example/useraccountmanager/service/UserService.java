@@ -19,6 +19,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Service class for managing users. This class provides methods to perform CRUD operations on the User entity.
+ */
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -26,18 +30,29 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    /**
+     * Retrieves a user by their ID.
+     *
+     * @param userId The ID of the user to retrieve.
+     * @return ResponseEntity containing the UserResponse if found, or an error message if not.
+     */
     public ResponseEntity<?> getUser(String userId) {
         UserResponse userResponse = new UserResponse();
         try {
+            // Validate userId input
             if (userId.isEmpty() || userId.isBlank()) {
                 userResponse.addError(ErrorMessage.BAD_REQUEST);
                 return new ResponseEntity<>(userResponse, HttpStatus.BAD_REQUEST);
             }
+
+            // Fetch user from the repository
             Optional<User> optionalUser = userRepository.findById(userId);
             if (optionalUser.isEmpty()) {
                 userResponse.addError(ErrorMessage.NOT_FOUND);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
+
+            // Map User entity to UserResponse DTO
             User user = optionalUser.get();
             userResponse = mapToUserDto(user);
             return new ResponseEntity<>(userResponse, HttpStatus.OK);
@@ -47,8 +62,17 @@ public class UserService {
         }
     }
 
+    /**
+     * Creates a new user.
+     *
+     * @param userRequest The UserRequest DTO containing the new user's data.
+     * @param bindingResult The BindingResult object that holds the result of the validation and binding and contains errors that may have occurred.
+     * @return ResponseEntity containing the created UserResponse or error message if the creation fails.
+     */
     public ResponseEntity<?> create(UserRequest userRequest, BindingResult bindingResult) {
         UserResponse userResponse = new UserResponse();
+
+        // Validate the input request
         if (bindingResult.hasErrors()) {
             UserResponse finalUserResponse = userResponse;
             bindingResult.getAllErrors().forEach(error -> {
@@ -57,10 +81,13 @@ public class UserService {
             return new ResponseEntity<>(userResponse, HttpStatus.BAD_REQUEST);
         }
         try {
+            // Check if a user with the same email already exists
             if (userRepository.existsByEmail(userRequest.getEmail())) {
                 userResponse.addError(ErrorMessage.ALREADY_EXIST);
                 return new ResponseEntity<>(userResponse, HttpStatus.BAD_REQUEST);
             }
+
+            // Create new User entity from UserRequest DTO
             User user = new User();
             user.setFirstName(userRequest.getFirstName());
             user.setLastName(userRequest.getLastName());
@@ -68,14 +95,19 @@ public class UserService {
             user.setEmail(userRequest.getEmail());
             user.setPhoneNumber(userRequest.getPhoneNumber());
             user.setAddress(userRequest.getAddress());
-            user.setLastLoginDate(userRequest.getLastLoginDate());
-            Set<Account> accounts = userRequest.getAccountRequests().stream().map(accountRequest -> {
-                Account account = new Account();
-                account.setBalance(accountRequest.getBalance());
-                account.setUser(user);
-                return account;
-            }).collect(Collectors.toSet());
-            user.setAccounts(accounts);
+
+            // Map AccountRequests to Account entities and associate them with the user
+            if (userRequest.getAccountRequests()!=null) {
+                Set<Account> accounts = userRequest.getAccountRequests().stream().map(accountRequest -> {
+                    Account account = new Account();
+                    account.setBalance(accountRequest.getBalance());
+                    account.setUser(user);
+                    return account;
+                }).collect(Collectors.toSet());
+                user.setAccounts(accounts);
+            }
+
+            // Save the new user to the repository
             userRepository.save(user);
             userResponse = mapToUserDto(user);
             return new ResponseEntity<>(userResponse, HttpStatus.CREATED);
@@ -85,19 +117,30 @@ public class UserService {
         }
     }
 
+    /**
+     * Updates an existing user by their ID.
+     *
+     * @param userId The ID of the user to update.
+     * @param userRequest The UserRequest DTO containing the updated data for the user.
+     * @return ResponseEntity containing the updated UserResponse or error message if the update fails.
+     */
     public ResponseEntity<?> update(String userId, UserRequest userRequest) {
         UserResponse userResponse = new UserResponse();
         try {
+            // Validate userId input
             if (userId == null || userId.isEmpty()) {
                 userResponse.addError(ErrorMessage.BAD_REQUEST);
                 return new ResponseEntity<>(userResponse, HttpStatus.BAD_REQUEST);
             }
+
+            // Fetch existing user from the repository
             Optional<User> optionalUser = userRepository.findById(userId);
             if (optionalUser.isEmpty()) {
                 userResponse.addError(ErrorMessage.NOT_FOUND);
                 return new ResponseEntity<>(userResponse, HttpStatus.NOT_FOUND);
             }
 
+            // Update the user fields with the data from UserRequest
             User existingUser = optionalUser.get();
             updateUserFields(existingUser, userRequest);
             userRepository.save(existingUser);
@@ -109,17 +152,27 @@ public class UserService {
         }
     }
 
+    /**
+     * Deletes a user by their ID.
+     *
+     * @param userId The ID of the user to delete.
+     * @return ResponseEntity with an information message if the deletion is successful or an error message if it fails.
+     */
     public ResponseEntity<?> deleteUser(String userId) {
         try {
+
+            // Validate userId input
             if (userId == null || userId.isEmpty()) {
                 return new ResponseEntity<>(ErrorMessage.BAD_REQUEST, HttpStatus.BAD_REQUEST);
             }
 
+            // Fetch existing user from the repository
             Optional<User> optionalUser = userRepository.findById(userId);
             if (optionalUser.isEmpty()) {
                 return new ResponseEntity<>(ErrorMessage.NOT_FOUND, HttpStatus.NOT_FOUND);
             }
 
+            // Delete the user from the repository
             userRepository.deleteById(userId);
             return new ResponseEntity<>(InfoMessage.DELETED, HttpStatus.OK);
         } catch (Exception e) {
@@ -128,6 +181,12 @@ public class UserService {
         }
     }
 
+    /**
+     * Maps a User entity to a UserResponse DTO.
+     *
+     * @param user The User entity to map.
+     * @return The UserResponse DTO containing the mapped data.
+     */
     private UserResponse mapToUserDto(User user) {
         return UserResponse.builder()
                 .id(user.getId())
@@ -145,6 +204,12 @@ public class UserService {
                 .build();
     }
 
+    /**
+     * Updates the fields of an existing user entity with the data from a UserRequest DTO.
+     *
+     * @param existingUser The existing User entity to update.
+     * @param userRequest The UserRequest DTO containing the updated data.
+     */
     private void updateUserFields(User existingUser, UserRequest userRequest) {
         if (userRequest.getFirstName() != null && !userRequest.getFirstName().equals(existingUser.getFirstName())) {
             existingUser.setFirstName(userRequest.getFirstName());
@@ -174,9 +239,6 @@ public class UserService {
                 existingAccounts.add(account);
             }
         }
-
-
     }
-
 
 }
