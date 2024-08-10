@@ -1,13 +1,28 @@
 package com.example.useraccountmanager.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
+@Builder
+@RequiredArgsConstructor
+@AllArgsConstructor
 public class AccountResponse {
 
-
+    private String id;
+    private String userId;
+    private BigDecimal balance;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<String> info = new ArrayList<>();

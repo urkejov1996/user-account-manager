@@ -12,7 +12,7 @@ public class UserRequest {
     private String lastName;
     private String username;
     private String email;
-    private String phoneNumber;
+    private Integer phoneNumber;
     private String address;
     private LocalDateTime lastLoginDate;
     private Set<AccountRequest> accountRequests;

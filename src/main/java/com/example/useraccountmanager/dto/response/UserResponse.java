@@ -22,7 +22,7 @@ public class UserResponse {
     private String lastName;
     private String username;
     private String email;
-    private String phoneNumber;
+    private Integer phoneNumber;
     private String address;
     private Set<String> accountIds;
     private LocalDateTime createdAt;

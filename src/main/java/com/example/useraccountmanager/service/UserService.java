@@ -39,7 +39,7 @@ public class UserService {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
             User user = optionalUser.get();
-            userResponse = mapToDto(user);
+            userResponse = mapToUserDto(user);
             return new ResponseEntity<>(userResponse, HttpStatus.OK);
         } catch (Exception e) {
             log.error("An error occurred while retrieving the user with ID: {}", userId, e);
@@ -77,7 +77,7 @@ public class UserService {
             }).collect(Collectors.toSet());
             user.setAccounts(accounts);
             userRepository.save(user);
-            userResponse = mapToDto(user);
+            userResponse = mapToUserDto(user);
             return new ResponseEntity<>(userResponse, HttpStatus.CREATED);
         } catch (Exception e) {
             log.error("An error occurred while creating user with email {}", userRequest.getEmail(), e);
@@ -101,7 +101,7 @@ public class UserService {
             User existingUser = optionalUser.get();
             updateUserFields(existingUser, userRequest);
             userRepository.save(existingUser);
-            userResponse = mapToDto(existingUser);
+            userResponse = mapToUserDto(existingUser);
             return new ResponseEntity<>(userResponse, HttpStatus.OK);
         } catch (Exception e) {
             log.error("An error occurred while updating user with ID: {}", userId, e);
@@ -128,7 +128,7 @@ public class UserService {
         }
     }
 
-    private UserResponse mapToDto(User user) {
+    private UserResponse mapToUserDto(User user) {
         return UserResponse.builder()
                 .id(user.getId())
                 .firstName(user.getFirstName())
