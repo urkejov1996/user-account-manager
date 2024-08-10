@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -30,10 +32,11 @@ public class AccountService {
     /**
      * Retrieves an account by the associated user's ID.
      *
-     * @param userId The ID of the user whose account to retrieve.
+     * @param userId    The ID of the user whose account to retrieve.
+     * @param accountId The exact ID of the account to retrieve.
      * @return ResponseEntity containing the AccountResponse if found, or an error message if not.
      */
-    public ResponseEntity<?> getAccount(String userId) {
+    public ResponseEntity<?> getAccount(String userId, String accountId) {
         AccountResponse accountResponse = new AccountResponse();
         try {
             // Validate userId input
@@ -41,9 +44,13 @@ public class AccountService {
                 accountResponse.addError(ErrorMessage.BAD_REQUEST);
                 return new ResponseEntity<>(accountResponse, HttpStatus.BAD_REQUEST);
             }
+            if (accountId.isEmpty() || accountId.isBlank()) {
+                accountResponse.addError(ErrorMessage.BAD_REQUEST);
+                return new ResponseEntity<>(accountResponse, HttpStatus.BAD_REQUEST);
+            }
 
             // Fetch the account associated with the user from the repository
-            Optional<Account> optionalAccount = accountRepository.findByUserId(userId);
+            Optional<Account> optionalAccount = accountRepository.findByIdAndUserId(accountId, userId);
             if (optionalAccount.isEmpty()) {
                 accountResponse.addError(ErrorMessage.NOT_FOUND);
                 return new ResponseEntity<>(accountResponse, HttpStatus.NOT_FOUND);
@@ -60,10 +67,47 @@ public class AccountService {
     }
 
     /**
+     * Retrieves all accounts associated with a specific user by their ID.
+     *
+     * @param userId The ID of the user whose accounts are to be retrieved.
+     * @return ResponseEntity containing a list of AccountResponse DTOs if found,
+     * or an informational message if no accounts exist, or an error message if the input is invalid.
+     */
+    public ResponseEntity<?> getAllAccounts(String userId) {
+        AccountResponse accountResponse = new AccountResponse();
+        try {
+            // Validate userId input
+            if (userId.isEmpty() || userId.isBlank()) {
+                accountResponse.addError(ErrorMessage.BAD_REQUEST);
+                return new ResponseEntity<>(accountResponse, HttpStatus.BAD_REQUEST);
+            }
+
+            // Fetch all accounts associated with the user from the repository
+            List<Account> accounts = accountRepository.findAllByUserId(userId);
+            if (accounts.isEmpty()) {
+                accountResponse.addInfo("There are no accounts yet.");
+                accountResponse.setData(new ArrayList<>());
+                return new ResponseEntity<>(accountResponse, HttpStatus.OK);
+            }
+
+            // Map each Account entity to an AccountResponse DTO using the mapToAccountDto method and collect the results into a list
+            List<AccountResponse> accountResponses = accounts.stream()
+                    .map(this::mapToAccountDto)
+                    .toList();
+
+            accountResponse.setData(accountResponses);
+            return new ResponseEntity<>(accountResponse, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("An error occurred while retrieving the account with userId: {}", userId, e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
      * Creates a new account.
      *
      * @param accountRequest The AccountRequest DTO containing the new account's data.
-     * @param bindingResult The BindingResult object that holds the result of the validation and binding and contains errors that may have occurred.
+     * @param bindingResult  The BindingResult object that holds the result of the validation and binding and contains errors that may have occurred.
      * @return ResponseEntity containing the created AccountResponse or error message if the creation fails.
      */
     public ResponseEntity<?> createAccount(AccountRequest accountRequest, BindingResult bindingResult) {
@@ -119,7 +163,6 @@ public class AccountService {
                 .userId(account.getUser().getId())
                 .createdAt(account.getCreatedAt())
                 .updatedAt(account.getUpdatedAt())
-                .deletedAt(account.getDeletedAt())
                 .build();
     }
 

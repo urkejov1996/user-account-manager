@@ -27,8 +27,6 @@ public class UserResponse {
     private Set<String> accountIds;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private LocalDateTime deletedAt;
-    private LocalDateTime lastLoginDate;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<String> info = new ArrayList<>();

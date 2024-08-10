@@ -198,7 +198,6 @@ public class UserService {
                 .address(user.getAddress())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
-                .deletedAt(user.getDeletedAt())
                 .accountIds(user.getAccounts().stream().map(account -> account.getId()).collect(Collectors.toSet()))
                 .build();
     }

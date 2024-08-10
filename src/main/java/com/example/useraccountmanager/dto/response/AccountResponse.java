@@ -22,7 +22,6 @@ public class AccountResponse {
     private BigDecimal balance;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private LocalDateTime deletedAt;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<String> info = new ArrayList<>();
@@ -31,7 +30,7 @@ public class AccountResponse {
     private List<String> errors = new ArrayList<>();
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private List<UserResponse> data = new ArrayList<>();
+    private List<AccountResponse> data = new ArrayList<>();
 
     public void addInfo(String info) {
         if (this.info == null) {

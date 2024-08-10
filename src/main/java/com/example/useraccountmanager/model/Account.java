@@ -38,9 +38,6 @@ public class Account {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
-
     @PrePersist
     private void prePersist() {
         LocalDateTime date = LocalDateTime.now();

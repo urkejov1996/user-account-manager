@@ -21,16 +21,21 @@ public class AccountController {
      * @param userId The ID of the user whose account is being retrieved
      * @return ResponseEntity containing the account data or an error message if not found
      */
+    @GetMapping("{userId}/{accountId}")
+    public ResponseEntity<?> getAccount(@PathVariable String userId, @PathVariable String accountId) {
+        return accountService.getAccount(userId, accountId);
+    }
+
     @GetMapping("{userId}")
-    public ResponseEntity<?> getAccount(@PathVariable String userId) {
-        return accountService.getAccount(userId);
+    public ResponseEntity<?> getAllAccounts(@PathVariable String userId) {
+        return accountService.getAllAccounts(userId);
     }
 
     /**
      * Creates a new account for the user based on the provided account request data.
      *
      * @param accountRequest DTO containing data for creating the account
-     * @param bindingResult Used to capture validation errors during request processing
+     * @param bindingResult  Used to capture validation errors during request processing
      * @return ResponseEntity containing the created account data or validation errors
      */
     @PostMapping()
