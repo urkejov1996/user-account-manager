@@ -15,6 +15,7 @@ import java.util.List;
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class AccountResponse {
 
     private String id;
@@ -23,13 +24,8 @@ public class AccountResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<String> info = new ArrayList<>();
-
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<String> errors = new ArrayList<>();
-
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<AccountResponse> data = new ArrayList<>();
 
     public void addInfo(String info) {
