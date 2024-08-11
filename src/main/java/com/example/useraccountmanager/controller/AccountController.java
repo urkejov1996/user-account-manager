@@ -18,14 +18,21 @@ public class AccountController {
     /**
      * Retrieves the account associated with the provided user ID.
      *
-     * @param userId The ID of the user whose account is being retrieved
-     * @return ResponseEntity containing the account data or an error message if not found
+     * @param userId The ID of the user whose account is being retrieved.
+     * @param accountId The ID of the account being retrieved.
+     * @return ResponseEntity containing the account data or an error message if not found.
      */
     @GetMapping("{userId}/{accountId}")
     public ResponseEntity<?> getAccount(@PathVariable String userId, @PathVariable String accountId) {
         return accountService.getAccount(userId, accountId);
     }
 
+    /**
+     * Retrieves all accounts associated with the provided user ID.
+     *
+     * @param userId The ID of the user whose accounts are being retrieved.
+     * @return ResponseEntity containing the list of accounts or an informational message if no accounts exist.
+     */
     @GetMapping("{userId}")
     public ResponseEntity<?> getAllAccounts(@PathVariable String userId) {
         return accountService.getAllAccounts(userId);
