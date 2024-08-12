@@ -74,8 +74,11 @@ public class UserService {
                 userResponse.setData(new ArrayList<>());
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-
-            return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+            List<UserResponse> userResponses = users.stream()
+                    .map(this::mapToUserDto)
+                    .toList();
+            userResponse.setData(userResponses);
+            return new ResponseEntity<>(userResponse, HttpStatus.NOT_IMPLEMENTED);
         } catch (Exception e) {
             log.error("An error occurred while retrieving all users", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
