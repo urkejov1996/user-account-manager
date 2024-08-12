@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -63,17 +65,27 @@ public class UserService {
     }
 
 
-
     public ResponseEntity<?> getAllUsers() {
+        UserResponse userResponse = new UserResponse();
+        try {
+            List<User> users = userRepository.findAll();
+            if (users.isEmpty()) {
+                userResponse.addInfo("There are no users in the database.");
+                userResponse.setData(new ArrayList<>());
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
 
-
-
+            return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+        } catch (Exception e) {
+            log.error("An error occurred while retrieving all users", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
      * Creates a new user.
      *
-     * @param userRequest The UserRequest DTO containing the new user's data.
+     * @param userRequest   The UserRequest DTO containing the new user's data.
      * @param bindingResult The BindingResult object that holds the result of the validation and binding and contains errors that may have occurred.
      * @return ResponseEntity containing the created UserResponse or error message if the creation fails.
      */
@@ -105,7 +117,7 @@ public class UserService {
             user.setAddress(userRequest.getAddress());
 
             // Map AccountRequests to Account entities and associate them with the user
-            if (userRequest.getAccountRequests()!=null) {
+            if (userRequest.getAccountRequests() != null) {
                 Set<Account> accounts = userRequest.getAccountRequests().stream().map(accountRequest -> {
                     Account account = new Account();
                     account.setBalance(accountRequest.getBalance());
@@ -128,7 +140,7 @@ public class UserService {
     /**
      * Updates an existing user by their ID.
      *
-     * @param userId The ID of the user to update.
+     * @param userId      The ID of the user to update.
      * @param userRequest The UserRequest DTO containing the updated data for the user.
      * @return ResponseEntity containing the updated UserResponse or error message if the update fails.
      */
@@ -214,7 +226,7 @@ public class UserService {
      * Updates the fields of an existing user entity with the data from a UserRequest DTO.
      *
      * @param existingUser The existing User entity to update.
-     * @param userRequest The UserRequest DTO containing the updated data.
+     * @param userRequest  The UserRequest DTO containing the updated data.
      */
     private void updateUserFields(User existingUser, UserRequest userRequest) {
         if (userRequest.getFirstName() != null && !userRequest.getFirstName().equals(existingUser.getFirstName())) {
