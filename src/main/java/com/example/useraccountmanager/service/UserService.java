@@ -62,6 +62,14 @@ public class UserService {
         }
     }
 
+
+
+    public ResponseEntity<?> getAllUsers() {
+
+
+
+    }
+
     /**
      * Creates a new user.
      *

@@ -25,6 +25,12 @@ public class UserController {
         return userService.getUser(userId);
     }
 
+
+    @GetMapping()
+    public ResponseEntity<?> getAllUsers(){
+        return userService.getAllUsers();
+    }
+
     /**
      * Create a new user.
      * @param userRequest The data for the new user.
