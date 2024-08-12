@@ -25,7 +25,11 @@ public class UserController {
         return userService.getUser(userId);
     }
 
-
+    /**
+     * Fetch all users from the database.
+     *
+     * @return ResponseEntity containing a list of all users or an error message if no users are found.
+     */
     @GetMapping()
     public ResponseEntity<?> getAllUsers(){
         return userService.getAllUsers();

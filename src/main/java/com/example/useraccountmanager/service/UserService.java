@@ -64,21 +64,27 @@ public class UserService {
         }
     }
 
-
+    /**
+     * Retrieves all users from the database.
+     *
+     * @return ResponseEntity containing a list of UserResponse DTOs for all users, or an information message if no users are found.
+     */
     public ResponseEntity<?> getAllUsers() {
         UserResponse userResponse = new UserResponse();
         try {
+            // Fetch all users from the repository
             List<User> users = userRepository.findAll();
             if (users.isEmpty()) {
                 userResponse.addInfo("There are no users in the database.");
                 userResponse.setData(new ArrayList<>());
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
+            // Map each User entity to a UserResponse DTO
             List<UserResponse> userResponses = users.stream()
                     .map(this::mapToUserDto)
                     .toList();
             userResponse.setData(userResponses);
-            return new ResponseEntity<>(userResponse, HttpStatus.NOT_IMPLEMENTED);
+            return new ResponseEntity<>(userResponse, HttpStatus.OK);
         } catch (Exception e) {
             log.error("An error occurred while retrieving all users", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
