@@ -12,7 +12,7 @@
 	<artifactId>user-account-manager</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>user-account-manager</name>
-	<description>Zadatak za Junior Java Developer poziciju</description>
+	<description>Application for user and user's accounts management</description>
 	<url/>
 	<licenses>
 		<license/>
