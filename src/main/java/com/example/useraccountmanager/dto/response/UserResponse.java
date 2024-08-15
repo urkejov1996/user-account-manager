@@ -1,6 +1,8 @@
 package com.example.useraccountmanager.dto.response;
 
+import com.example.useraccountmanager.tools.UserStatusEnum;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,6 +30,7 @@ public class UserResponse {
     private Set<String> accountIds;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private UserStatusEnum status;
 
     private List<String> info = new ArrayList<>();
     private List<String> errors = new ArrayList<>();

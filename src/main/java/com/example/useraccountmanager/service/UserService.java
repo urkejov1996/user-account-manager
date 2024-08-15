@@ -123,6 +123,7 @@ public class UserService {
             user.setUsername(userRequest.getUsername());
             user.setEmail(userRequest.getEmail());
             user.setPhoneNumber(userRequest.getPhoneNumber());
+            user.setUserStatus(userRequest.getStatus());
             user.setAddress(userRequest.getAddress());
 
             // Map AccountRequests to Account entities and associate them with the user
@@ -225,6 +226,7 @@ public class UserService {
                 .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
                 .address(user.getAddress())
+                .status(user.getUserStatus())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .accountIds(user.getAccounts().stream().map(account -> account.getId()).collect(Collectors.toSet()))
@@ -252,6 +254,9 @@ public class UserService {
         }
         if (userRequest.getPhoneNumber() != null && !userRequest.getPhoneNumber().equals(existingUser.getPhoneNumber())) {
             existingUser.setPhoneNumber(userRequest.getPhoneNumber());
+        }
+        if (userRequest.getStatus() != null && !userRequest.getStatus().equals(existingUser.getUserStatus())) {
+            existingUser.setUserStatus(userRequest.getStatus());
         }
         if (userRequest.getAddress() != null && !userRequest.getAddress().equals(existingUser.getAddress())) {
             existingUser.setAddress(userRequest.getAddress());

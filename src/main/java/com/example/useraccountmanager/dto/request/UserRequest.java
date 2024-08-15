@@ -1,5 +1,6 @@
 package com.example.useraccountmanager.dto.request;
 
+import com.example.useraccountmanager.tools.UserStatusEnum;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -21,5 +22,7 @@ public class UserRequest {
     private Integer phoneNumber;
     @NotNull
     private String address;
+    @NotNull
+    private UserStatusEnum status;
     private Set<AccountRequest> accountRequests;
 }
