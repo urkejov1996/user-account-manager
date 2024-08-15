@@ -1,5 +1,6 @@
 package com.example.useraccountmanager.model;
 
+import com.example.useraccountmanager.tools.UserStatusEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
@@ -45,6 +46,9 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Account> accounts = new HashSet<>();
+
+    @Column(name = "status")
+    private UserStatusEnum userStatus;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
