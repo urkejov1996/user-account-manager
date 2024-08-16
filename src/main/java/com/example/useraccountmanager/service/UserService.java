@@ -8,6 +8,11 @@ import com.example.useraccountmanager.model.User;
 import com.example.useraccountmanager.repository.UserRepository;
 import com.example.useraccountmanager.tools.ErrorMessage;
 import com.example.useraccountmanager.tools.InfoMessage;
+import com.example.useraccountmanager.tools.UserStatusEnum;
+import com.google.firebase.auth.AuthErrorCode;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.UserRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,10 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -208,6 +210,45 @@ public class UserService {
         } catch (Exception e) {
             log.error("An error occurred while deleting user with ID: {}", userId, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public void initSuperAdminIfNotExist(UserRequest userRequest) {
+        try {
+            Optional<User> optionalUser = userRepository.findUserByEmail(userRequest.getEmail());
+            if (optionalUser.isPresent()) {
+                return;
+            }
+            UserRecord userFirebase;
+            try {
+                userFirebase = FirebaseAuth.getInstance().getUserByEmail(userRequest.getEmail());
+            } catch (FirebaseAuthException e) {
+                if (e.getAuthErrorCode() == AuthErrorCode.USER_NOT_FOUND) {
+                    UserRecord.CreateRequest request = new UserRecord.CreateRequest()
+                            .setEmail(userRequest.getEmail())
+                            .setEmailVerified(true)
+                            .setPassword(userRequest.getPassword())
+                            .setDisplayName(userRequest.getUsername())
+                            .setDisabled(userRequest.getStatus().equals(UserStatusEnum.INACTIVE));
+                    userFirebase = FirebaseAuth.getInstance().createUser(request);
+
+                } else {
+                    throw new RuntimeException("Firebase Exception :: " + e.getMessage() + " :: code name :: " + e.getAuthErrorCode().name());
+                }
+            }
+            FirebaseAuth.getInstance().setCustomUserClaims(userFirebase.getUid(), Map.of("roles",
+                    List.of(UserRoleEnum.ADMIN.name(), UserRoleEnum.USER.name())));
+            User user = userRepository.save(User.builder()
+                    .firstName(userRequest.getFirstName())
+                    .lastName(userRequest.getLastName())
+                    .username(userRequest.getUsername())
+                    .email(userRequest.getEmail())
+                    .userStatus(userRequest.getStatus())
+                    .firebaseUid(userFirebase.getUid())
+                    .build());
+            log.info("SUPER ADMIN INIT DONE, with firebase id: {} and email: {}", user.getFirebaseUid(), user.getEmail());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
