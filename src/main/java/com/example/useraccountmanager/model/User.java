@@ -44,6 +44,9 @@ public class User {
     @Column(name = "address")
     private String address;
 
+    @Column(name = "firebase_uid")
+    private String firebaseUid;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Account> accounts = new HashSet<>();
 
