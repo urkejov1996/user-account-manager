@@ -19,6 +19,8 @@ public class UserRequest {
     @Email
     private String email;
     @NotNull
+    private String password;
+    @NotNull
     private Integer phoneNumber;
     @NotNull
     private String address;
