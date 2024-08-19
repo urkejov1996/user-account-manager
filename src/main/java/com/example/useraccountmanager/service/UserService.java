@@ -9,6 +9,7 @@ import com.example.useraccountmanager.repository.UserRepository;
 import com.example.useraccountmanager.tools.ErrorMessage;
 import com.example.useraccountmanager.tools.InfoMessage;
 import com.example.useraccountmanager.tools.UserStatusEnum;
+import com.example.useraccountmanager.tools.enums.UserRoleEnum;
 import com.google.firebase.auth.AuthErrorCode;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
@@ -213,6 +214,11 @@ public class UserService {
         }
     }
 
+    /**
+     * Initializes a super admin user if they do not already exist in the system.
+     *
+     * @param userRequest The UserRequest DTO containing the super admin's data.
+     */
     public void initSuperAdminIfNotExist(UserRequest userRequest) {
         try {
             Optional<User> optionalUser = userRepository.findUserByEmail(userRequest.getEmail());

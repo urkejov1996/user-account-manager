@@ -1,6 +1,7 @@
 package com.example.useraccountmanager.model;
 
 import com.example.useraccountmanager.tools.UserStatusEnum;
+import com.example.useraccountmanager.tools.enums.UserRoleEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
@@ -46,6 +47,10 @@ public class User {
 
     @Column(name = "firebase_uid")
     private String firebaseUid;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private UserRoleEnum userRole;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Account> accounts = new HashSet<>();
