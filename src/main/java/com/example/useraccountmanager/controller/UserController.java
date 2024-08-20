@@ -8,6 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/users")
@@ -55,6 +58,11 @@ public class UserController {
     @PutMapping("{userId}")
     public ResponseEntity<?> update(@PathVariable String userId, @RequestBody UserRequest userRequest) {
         return userService.update(userId, userRequest);
+    }
+
+    @PutMapping("{userId}/activate")
+    public ResponseEntity<?> activate(@PathVariable String userId) {
+        return userService.activate(userId);
     }
 
     /**

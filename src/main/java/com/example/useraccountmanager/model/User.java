@@ -55,6 +55,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Account> accounts = new HashSet<>();
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private UserStatusEnum userStatus;
 
