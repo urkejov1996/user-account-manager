@@ -185,7 +185,33 @@ public class UserService {
         }
     }
 
+    public ResponseEntity<?> activate(String userId) {
+        UserResponse userResponse = new UserResponse();
 
+        try {
+            // Validate userId input
+            if (userId == null || userId.isEmpty()) {
+                userResponse.addError(ErrorMessage.BAD_REQUEST);
+                return new ResponseEntity<>(userResponse, HttpStatus.BAD_REQUEST);
+            }
+
+            // Fetch existing user from the repository
+            Optional<User> optionalUser = userRepository.findById(userId);
+            if (optionalUser.isEmpty()) {
+                userResponse.addError(ErrorMessage.NOT_FOUND);
+                return new ResponseEntity<>(userResponse, HttpStatus.NOT_FOUND);
+            }
+            User existingUser = optionalUser.get();
+//            updateUserFields(existingUser, userRequest);
+            existingUser.setUserStatus(UserStatusEnum.ACTIVE);
+            userRepository.save(existingUser);
+            userResponse = mapToUserDto(existingUser);
+            return new ResponseEntity<>(userResponse, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("An error occurred while activating user with ID: {}", userId, e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 
 
