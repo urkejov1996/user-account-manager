@@ -49,4 +49,9 @@ public class AccountController {
     public ResponseEntity<?> createAccount(@RequestBody @Valid AccountRequest accountRequest, BindingResult bindingResult) {
         return accountService.createAccount(accountRequest, bindingResult);
     }
+
+    @PutMapping("{userId}/{accountId}")
+    public ResponseEntity<?> updateAccountBalance(@RequestBody AccountRequest accountRequest){
+        return accountService.updateAccountBalance(accountRequest);
+    }
 }

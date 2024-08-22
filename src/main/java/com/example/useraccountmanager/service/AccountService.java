@@ -150,6 +150,10 @@ public class AccountService {
         }
     }
 
+    public ResponseEntity<?> updateAccountBalance(AccountRequest accountRequest) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
     /**
      * Maps an Account entity to an AccountResponse DTO.
      *
@@ -165,6 +169,5 @@ public class AccountService {
                 .updatedAt(account.getUpdatedAt())
                 .build();
     }
-
 
 }
