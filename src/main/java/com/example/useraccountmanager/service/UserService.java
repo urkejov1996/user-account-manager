@@ -128,7 +128,7 @@ public class UserService {
             user.setPhoneNumber(userRequest.getPhoneNumber());
             user.setUserStatus(userRequest.getStatus());
             user.setAddress(userRequest.getAddress());
-
+            user.setUserStatus(UserStatusEnum.INACTIVE);
             // Map AccountRequests to Account entities and associate them with the user
             if (userRequest.getAccountRequests() != null) {
                 Set<Account> accounts = userRequest.getAccountRequests().stream().map(accountRequest -> {

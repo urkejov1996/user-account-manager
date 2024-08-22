@@ -60,6 +60,11 @@ public class UserController {
         return userService.update(userId, userRequest);
     }
 
+    /**
+     * Activate a user by their unique ID.
+     * @param userId The ID of the user to be activated.
+     * @return ResponseEntity containing the activated user data or an error message.
+     */
     @PutMapping("{userId}/activate")
     public ResponseEntity<?> activate(@PathVariable String userId) {
         return userService.activate(userId);
