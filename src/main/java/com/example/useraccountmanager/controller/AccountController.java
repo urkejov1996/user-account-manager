@@ -50,6 +50,12 @@ public class AccountController {
         return accountService.createAccount(accountRequest, bindingResult);
     }
 
+    /**
+     * Updates the balance of an existing account.
+     *
+     * @param accountRequest DTO containing the updated account balance information.
+     * @return ResponseEntity containing the updated account data or an error message if the update fails.
+     */
     @PutMapping("{userId}/{accountId}")
     public ResponseEntity<?> updateAccountBalance(@RequestBody AccountRequest accountRequest){
         return accountService.updateAccountBalance(accountRequest);
