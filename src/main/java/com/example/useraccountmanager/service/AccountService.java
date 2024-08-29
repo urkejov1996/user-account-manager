@@ -150,6 +150,13 @@ public class AccountService {
         }
     }
 
+    /**
+     * Updates the balance of an existing account.
+     *
+     * @param accountRequest The AccountRequest DTO containing the new balance and user ID.
+     * @param accountId      The ID of the account to be updated.
+     * @return ResponseEntity containing the updated AccountResponse or an error message if the update fails.
+     */
     public ResponseEntity<?> updateAccountBalance(AccountRequest accountRequest, String accountId) {
         AccountResponse accountResponse = new AccountResponse();
         try {
