@@ -57,7 +57,7 @@ public class AccountController {
      * @return ResponseEntity containing the updated account data or an error message if the update fails.
      */
     @PutMapping("{userId}/{accountId}")
-    public ResponseEntity<?> updateAccountBalance(@RequestBody AccountRequest accountRequest){
-        return accountService.updateAccountBalance(accountRequest);
+    public ResponseEntity<?> updateAccountBalance(@RequestBody AccountRequest accountRequest,@PathVariable String accountId){
+        return accountService.updateAccountBalance(accountRequest,accountId);
     }
 }

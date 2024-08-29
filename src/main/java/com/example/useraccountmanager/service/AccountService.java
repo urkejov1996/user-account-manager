@@ -150,8 +150,29 @@ public class AccountService {
         }
     }
 
-    public ResponseEntity<?> updateAccountBalance(AccountRequest accountRequest) {
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    public ResponseEntity<?> updateAccountBalance(AccountRequest accountRequest, String accountId) {
+        AccountResponse accountResponse = new AccountResponse();
+        try {
+            if (accountRequest.getUserId().isEmpty() || accountRequest.getUserId().isBlank()) {
+                accountResponse.addError(ErrorMessage.BAD_REQUEST);
+                return new ResponseEntity<>(accountResponse, HttpStatus.BAD_REQUEST);
+            }
+            Optional<User> optionalUser = userRepository.findById(accountRequest.getUserId());
+            if (optionalUser.isEmpty()) {
+                accountResponse.addError(ErrorMessage.NOT_FOUND);
+                return new ResponseEntity<>(accountResponse, HttpStatus.NOT_FOUND);
+            }
+          Optional<Account> optionalAccount = optionalUser.get().getAccounts()
+                  .stream()
+                  .filter(account -> account.getId().equals(accountId))
+                  .findFirst();
+
+            return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+        }catch (Exception e){
+            log.error("An error occurred while creating the account with accountId: {}",accountId , e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
     /**
