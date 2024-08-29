@@ -170,17 +170,23 @@ public class AccountService {
                     .stream()
                     .filter(account -> account.getId().equals(accountId))
                     .findFirst();
+
             if (optionalAccount.isEmpty()) {
                 accountResponse.addError(ErrorMessage.NOT_FOUND);
                 return new ResponseEntity<>(accountResponse, HttpStatus.NOT_FOUND);
             }
 
-            return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+            Account accountToUpdate = optionalAccount.get();
+            if (!accountRequest.getBalance().equals(optionalAccount.get().getBalance())) {
+                accountToUpdate.setBalance(accountRequest.getBalance());
+            }
+            accountRepository.save(accountToUpdate);
+            accountResponse = mapToAccountDto(accountToUpdate);
+            return new ResponseEntity<>(accountResponse, HttpStatus.OK);
         } catch (Exception e) {
             log.error("An error occurred while creating the account with accountId: {}", accountId, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
     /**
