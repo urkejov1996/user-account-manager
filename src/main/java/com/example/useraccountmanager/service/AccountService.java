@@ -162,14 +162,22 @@ public class AccountService {
                 accountResponse.addError(ErrorMessage.NOT_FOUND);
                 return new ResponseEntity<>(accountResponse, HttpStatus.NOT_FOUND);
             }
-          Optional<Account> optionalAccount = optionalUser.get().getAccounts()
-                  .stream()
-                  .filter(account -> account.getId().equals(accountId))
-                  .findFirst();
+            if (accountId.isBlank() || accountId.isEmpty()) {
+                accountResponse.addError(ErrorMessage.BAD_REQUEST);
+                return new ResponseEntity<>(accountResponse, HttpStatus.BAD_REQUEST);
+            }
+            Optional<Account> optionalAccount = optionalUser.get().getAccounts()
+                    .stream()
+                    .filter(account -> account.getId().equals(accountId))
+                    .findFirst();
+            if (optionalAccount.isEmpty()) {
+                accountResponse.addError(ErrorMessage.NOT_FOUND);
+                return new ResponseEntity<>(accountResponse, HttpStatus.NOT_FOUND);
+            }
 
             return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-        }catch (Exception e){
-            log.error("An error occurred while creating the account with accountId: {}",accountId , e);
+        } catch (Exception e) {
+            log.error("An error occurred while creating the account with accountId: {}", accountId, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
