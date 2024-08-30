@@ -160,7 +160,8 @@ public class AccountService {
     public ResponseEntity<?> updateAccountBalance(AccountRequest accountRequest, String accountId) {
         AccountResponse accountResponse = new AccountResponse();
         try {
-            if (accountRequest.getUserId().isEmpty() || accountRequest.getUserId().isBlank()) {
+            if (accountRequest.getUserId().isEmpty() || accountRequest.getUserId().isBlank() ||
+                    accountId.isBlank() || accountId.isEmpty() ) {
                 accountResponse.addError(ErrorMessage.BAD_REQUEST);
                 return new ResponseEntity<>(accountResponse, HttpStatus.BAD_REQUEST);
             }
@@ -169,10 +170,7 @@ public class AccountService {
                 accountResponse.addError(ErrorMessage.NOT_FOUND);
                 return new ResponseEntity<>(accountResponse, HttpStatus.NOT_FOUND);
             }
-            if (accountId.isBlank() || accountId.isEmpty()) {
-                accountResponse.addError(ErrorMessage.BAD_REQUEST);
-                return new ResponseEntity<>(accountResponse, HttpStatus.BAD_REQUEST);
-            }
+
             Optional<Account> optionalAccount = optionalUser.get().getAccounts()
                     .stream()
                     .filter(account -> account.getId().equals(accountId))
@@ -184,10 +182,11 @@ public class AccountService {
             }
 
             Account accountToUpdate = optionalAccount.get();
-            if (!accountRequest.getBalance().equals(optionalAccount.get().getBalance())) {
+
+            if (!accountRequest.getBalance().equals(accountToUpdate.getBalance())) {
                 accountToUpdate.setBalance(accountRequest.getBalance());
+                accountRepository.save(accountToUpdate);
             }
-            accountRepository.save(accountToUpdate);
             accountResponse = mapToAccountDto(accountToUpdate);
             return new ResponseEntity<>(accountResponse, HttpStatus.OK);
         } catch (Exception e) {
