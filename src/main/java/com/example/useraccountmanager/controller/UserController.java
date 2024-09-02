@@ -2,9 +2,14 @@ package com.example.useraccountmanager.controller;
 
 import com.example.useraccountmanager.dto.request.UserRequest;
 import com.example.useraccountmanager.service.UserService;
+import com.example.useraccountmanager.tools.RoleTools;
+import com.example.useraccountmanager.tools.enums.UserRoleEnum;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +25,7 @@ public class UserController {
 
     /**
      * Fetch a user by their unique ID.
+     *
      * @param userId The ID of the user to be fetched.
      * @return ResponseEntity containing the user data or an error message.
      */
@@ -34,24 +40,34 @@ public class UserController {
      * @return ResponseEntity containing a list of all users or an error message if no users are found.
      */
     @GetMapping()
-    public ResponseEntity<?> getAllUsers(){
+    public ResponseEntity<?> getAllUsers() {
         return userService.getAllUsers();
     }
 
     /**
-     * Create a new user.
-     * @param userRequest The data for the new user.
-     * @param bindingResult Binding result for validation errors.
-     * @return ResponseEntity containing the created user data or an error message.
+     * Creates a new user in the system.
+     *
+     * @param userRequest   The DTO containing the data for the new user to be created.
+     * @param jwt           The JWT token of the currently authenticated user, used to check their role and permissions.
+     * @param bindingResult The BindingResult object to capture any validation errors for the incoming user request.
+     * @return ResponseEntity containing the created user's data if the user has sufficient permissions and there are no validation errors;
+     * otherwise, returns an appropriate error response.
      */
     @PostMapping()
-    public ResponseEntity<?> create(@RequestBody @Valid UserRequest userRequest, BindingResult bindingResult) {
+    public ResponseEntity<?> create(@RequestBody @Valid UserRequest userRequest, @AuthenticationPrincipal Jwt jwt, BindingResult bindingResult) {
+        if (!RoleTools.hasAccess(jwt, new ArrayList<>(List.of(
+                UserRoleEnum.ADMIN.name(),
+                UserRoleEnum.USER.name()
+        )))) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         return userService.create(userRequest, bindingResult);
     }
 
     /**
      * Update an existing user by their unique ID.
-     * @param userId The ID of the user to be updated.
+     *
+     * @param userId      The ID of the user to be updated.
      * @param userRequest The new data for the user.
      * @return ResponseEntity containing the updated user data or an error message.
      */
@@ -62,6 +78,7 @@ public class UserController {
 
     /**
      * Activate a user by their unique ID.
+     *
      * @param userId The ID of the user to be activated.
      * @return ResponseEntity containing the activated user data or an error message.
      */
@@ -72,6 +89,7 @@ public class UserController {
 
     /**
      * Delete a user by their unique ID.
+     *
      * @param userId The ID of the user to be deleted.
      * @return ResponseEntity containing a confirmation message or an error message.
      */
