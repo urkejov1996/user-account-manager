@@ -25,22 +25,39 @@ public class UserController {
 
     /**
      * Fetch a user by their unique ID.
+     * This endpoint retrieves the data of a specific user based on their user ID.
+     * Access to this endpoint is restricted based on the user's role.
      *
      * @param userId The ID of the user to be fetched.
-     * @return ResponseEntity containing the user data or an error message.
+     * @param jwt    The JWT token of the currently authenticated user, used to verify their role and permissions.
+     * @return ResponseEntity containing the user data if the user has the required role;
+     * otherwise, returns an unauthorized error.
      */
     @GetMapping("{userId}")
-    public ResponseEntity<?> getUser(@PathVariable String userId) {
+    public ResponseEntity<?> getUser(@PathVariable String userId, @AuthenticationPrincipal Jwt jwt) {
+        if (RoleTools.hasAccess(jwt, new ArrayList<>(List.of(
+                UserRoleEnum.USER.name()
+        )))) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         return userService.getUser(userId);
     }
 
     /**
      * Fetch all users from the database.
+     * <p>
+     * This endpoint retrieves a list of all users. Access is restricted based on the user's role.
      *
-     * @return ResponseEntity containing a list of all users or an error message if no users are found.
+     * @param jwt The JWT token of the currently authenticated user, used to verify their role and permissions.
+     * @return ResponseEntity containing a list of all users if the user has the required role; otherwise, returns an unauthorized error.
      */
     @GetMapping()
-    public ResponseEntity<?> getAllUsers() {
+    public ResponseEntity<?> getAllUsers(@AuthenticationPrincipal Jwt jwt) {
+        if (RoleTools.hasAccess(jwt, new ArrayList<>(List.of(
+                UserRoleEnum.USER.name()
+        )))) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         return userService.getAllUsers();
     }
 
@@ -66,13 +83,23 @@ public class UserController {
 
     /**
      * Update an existing user by their unique ID.
+     * This endpoint allows updating the details of a specific user based on their user ID.
+     * The access to this endpoint is restricted and is allowed only to users with specific roles.
      *
      * @param userId      The ID of the user to be updated.
-     * @param userRequest The new data for the user.
-     * @return ResponseEntity containing the updated user data or an error message.
+     * @param userRequest The new data for the user provided in the request body.
+     * @param jwt         The JWT token of the currently authenticated user, used to verify their role and permissions.
+     * @return ResponseEntity containing the updated user data if the user has the required role;
+     *         otherwise, returns an unauthorized error.
      */
     @PutMapping("{userId}")
-    public ResponseEntity<?> update(@PathVariable String userId, @RequestBody UserRequest userRequest) {
+    public ResponseEntity<?> update(@PathVariable String userId, @RequestBody UserRequest userRequest, @AuthenticationPrincipal Jwt jwt) {
+        if (!RoleTools.hasAccess(jwt, new ArrayList<>(List.of(
+                UserRoleEnum.ADMIN.name(),
+                UserRoleEnum.USER.name()
+        )))) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         return userService.update(userId, userRequest);
     }
 
