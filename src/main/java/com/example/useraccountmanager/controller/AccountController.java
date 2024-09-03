@@ -2,11 +2,19 @@ package com.example.useraccountmanager.controller;
 
 import com.example.useraccountmanager.dto.request.AccountRequest;
 import com.example.useraccountmanager.service.AccountService;
+import com.example.useraccountmanager.tools.RoleTools;
+import com.example.useraccountmanager.tools.enums.UserRoleEnum;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/accounts")
@@ -23,7 +31,12 @@ public class AccountController {
      * @return ResponseEntity containing the account data or an error message if not found.
      */
     @GetMapping("{userId}/{accountId}")
-    public ResponseEntity<?> getAccount(@PathVariable String userId, @PathVariable String accountId) {
+    public ResponseEntity<?> getAccount(@PathVariable String userId, @PathVariable String accountId, @AuthenticationPrincipal Jwt jwt) {
+        if (!RoleTools.hasAccess(jwt, new ArrayList<>(List.of(
+                UserRoleEnum.ADMIN.name()
+        )))) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         return accountService.getAccount(userId, accountId);
     }
 
@@ -34,7 +47,12 @@ public class AccountController {
      * @return ResponseEntity containing the list of accounts or an informational message if no accounts exist.
      */
     @GetMapping("{userId}")
-    public ResponseEntity<?> getAllAccounts(@PathVariable String userId) {
+    public ResponseEntity<?> getAllAccounts(@PathVariable String userId, @AuthenticationPrincipal Jwt jwt) {
+        if (!RoleTools.hasAccess(jwt, new ArrayList<>(List.of(
+                UserRoleEnum.ADMIN.name()
+        )))) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         return accountService.getAllAccounts(userId);
     }
 
