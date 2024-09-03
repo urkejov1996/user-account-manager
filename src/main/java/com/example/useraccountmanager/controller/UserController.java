@@ -110,7 +110,13 @@ public class UserController {
      * @return ResponseEntity containing the activated user data or an error message.
      */
     @PutMapping("{userId}/activate")
-    public ResponseEntity<?> activate(@PathVariable String userId) {
+    public ResponseEntity<?> activate(@PathVariable String userId, @AuthenticationPrincipal Jwt jwt) {
+        if (!RoleTools.hasAccess(jwt, new ArrayList<>(List.of(
+                UserRoleEnum.ADMIN.name(),
+                UserRoleEnum.USER.name()
+        )))) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         return userService.activate(userId);
     }
 
@@ -121,7 +127,13 @@ public class UserController {
      * @return ResponseEntity containing a confirmation message or an error message.
      */
     @DeleteMapping("{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable String userId) {
+    public ResponseEntity<?> deleteUser(@PathVariable String userId, @AuthenticationPrincipal Jwt jwt) {
+        if (!RoleTools.hasAccess(jwt, new ArrayList<>(List.of(
+                UserRoleEnum.ADMIN.name(),
+                UserRoleEnum.USER.name()
+        )))) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
         return userService.deleteUser(userId);
     }
 }
